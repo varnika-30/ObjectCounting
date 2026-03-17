@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Box Counter</title>
+</head>
+
+
+
+
+
+
+<body style="font-family: Arial; text-align: center; margin-top: 50px;">
+
+<h1>TEST VERSION</h1>
+<h2>📦 Box Counting System</h2>
+
+<input type="file" id="videoInput" accept="video/*">
+<br><br>
+
+<button id="startBtn" 
+        style="padding: 10px 20px; font-size: 16px;">
+    Upload & Count
+</button>
+
+
+
+
+
+<p id="result"></p>
+
+<script>
+console.log("SCRIPT LOADED");
+
+// attach event AFTER page loads
+window.onload = function () {
+    document.getElementById("startBtn").addEventListener("click", startCounting);
+};
+
+async function startCounting() {
+
+    console.log("BUTTON CLICKED");
+
+    let fileInput = document.getElementById("videoInput");
+    let file = fileInput.files[0];
+    let btn = document.getElementById("startBtn");
+
+    if (!file) {
+        alert("Please select a video first!");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("video", file);
+
+    document.getElementById("result").textContent = "Processing... ⏳";
+    btn.disabled = true;
+
+    try {
+        console.log("Sending request...");
+
+        let res = await fetch("http://127.0.0.1:5000/start", {
+            method: "POST",
+            body: formData
+        });
+
+        console.log("Response received");
+
+        let text = await res.text();
+        console.log("RAW RESPONSE:", text);
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error("JSON parse failed:", e);
+            document.getElementById("result").textContent =
+                "Invalid response from server ❌";
+            return;
+        }
+
+        console.log("PARSED DATA:", data);
+
+        if (data && data.final_count !== undefined) {
+            document.getElementById("result").textContent =
+                "Final Count: " + data.final_count;
+        } else {
+            document.getElementById("result").textContent =
+                "Error: " + JSON.stringify(data);
+        }
+
+    } catch (error) {
+        console.error("FETCH ERROR:", error);
+        document.getElementById("result").textContent =
+            "Something went wrong ❌";
+    }
+
+    btn.disabled = false;
+}
+</script>
+
+</body>
+</html>

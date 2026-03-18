@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Box Counting System</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.22), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.20), transparent 30%),
+        linear-gradient(135deg, #eaf2ff 0%, #eef2ff 45%, #f7f1ff 100%);
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      filter: blur(70px);
+      z-index: 0;
+    }
+
+    body::before {
+      top: 60px;
+      left: 120px;
+      background: rgba(99, 102, 241, 0.18);
+    }
+
+    body::after {
+      bottom: 60px;
+      right: 120px;
+      background: rgba(192, 132, 252, 0.18);
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 28px;
+      padding: 36px 32px;
+      box-shadow:
+        0 20px 45px rgba(79, 70, 229, 0.12),
+        0 8px 18px rgba(15, 23, 42, 0.06);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    .input-group input[type="text"],
+    .input-group input[type="number"] {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.25s ease;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .input-group input[type="text"]:focus,
+    .input-group input[type="number"]:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
+    }
+
+    .file-upload-box {
+      border: 2px dashed #a5b4fc;
+      border-radius: 16px;
+      background: rgba(248, 250, 252, 0.95);
+      padding: 16px;
+      transition: 0.25s ease;
+    }
+
+    .file-upload-box:hover {
+      border-color: #7c3aed;
+      background: #f8faff;
+    }
+
+    .file-upload-box input[type="file"] {
+      display: none;
+    }
+
+    .custom-file-label {
+      display: inline-block;
+      padding: 11px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fffaf0 !important;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(99, 102, 241, 0.22);
+      transition: 0.25s ease;
+    }
+
+    .custom-file-label:hover {
+      transform: translateY(-1px);
+      opacity: 0.97;
+    }
+
+    .file-name {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #475569;
+      word-break: break-word;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .upload-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.96;
+    }
+
+    .stop-btn {
+      background: rgba(241, 245, 249, 0.92);
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
+    .stop-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+
+    .status-box,
+    .result-box {
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .status-box {
+      background: rgba(238, 242, 255, 0.95);
+      color: #4338ca;
+    }
+
+    .result-box {
+      background: rgba(248, 250, 252, 0.96);
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📦 Box Counting System</h1>
+    <p class="subtitle">Upload a video and get the final counted result</p>
+
+    <div class="input-group">
+      <label>Operator ID</label>
+      <input type="text" id="operatorId" value="operator_1">
+    </div>
+
+    <div class="input-group">
+      <label>Batch ID</label>
+      <input type="text" id="batchId" value="batch_1">
+    </div>
+
+    <div class="input-group">
+      <label>Confidence Threshold</label>
+      <input type="number" id="confidence" value="0.5" step="0.1" min="0" max="1">
+    </div>
+
+    <div class="input-group">
+      <label>Upload Video</label>
+      <div class="file-upload-box">
+        <label for="videoFile" class="custom-file-label">Choose Video</label>
+        <input type="file" id="videoFile" accept="video/*" onchange="updateFileName()">
+        <div class="file-name" id="fileName">No file chosen</div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="upload-btn" onclick="uploadAndCount()">Upload & Count</button>
+      <button class="stop-btn" onclick="stopSession()">Stop Session</button>
+    </div>
+
+    <div class="status-box" id="sessionStatus">Session Status: Ready</div>
+    <div class="result-box" id="result">Final Count: -</div>
+  </div>
+
+  <script>
+    function updateFileName() {
+      const fileInput = document.getElementById("videoFile");
+      const fileName = document.getElementById("fileName");
+
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+      } else {
+        fileName.textContent = "No file chosen";
+      }
+    }
+
+    async function uploadAndCount() {
+      try {
+        const fileInput = document.getElementById("videoFile");
+        const operatorId = document.getElementById("operatorId").value;
+        const batchId = document.getElementById("batchId").value;
+        const confidence = document.getElementById("confidence").value;
+
+        if (!fileInput.files.length) {
+          alert("Please choose a video file first.");
+          return;
+        }
+
+        document.getElementById("sessionStatus").textContent = "Session Status: Processing...";
+        document.getElementById("result").textContent = "Processing video...";
+
+        const formData = new FormData();
+        formData.append("video", fileInput.files[0]);
+        formData.append("operator_id", operatorId);
+        formData.append("batch_id", batchId);
+        formData.append("confidence", confidence);
+
+        const res = await fetch("http://127.0.0.1:5000/start", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        console.log("START RESPONSE:", data);
+
+        if (data.success) {
+          document.getElementById("result").textContent = "Final Count: " + data.count;
+          document.getElementById("sessionStatus").textContent = "Session Status: Completed";
+        } else {
+          document.getElementById("result").textContent = "Error: " + data.error;
+          document.getElementById("sessionStatus").textContent = "Session Status: Error";
+        }
+      } catch (error) {
+        console.error("UPLOAD ERROR:", error);
+        document.getElementById("result").textContent = "Error: Could not connect to backend";
+        document.getElementById("sessionStatus").textContent = "Session Status: Error";
+      }
+    }
+
+    async function stopSession() {
+      try {
+        const res = await fetch("http://127.0.0.1:5000/stop", {
+          method: "POST"
+        });
+
+        const data = await res.json();
+        console.log("STOP RESPONSE:", data);
+
+        document.getElementById("sessionStatus").textContent = "Session Status: Stopped";
+        document.getElementById("result").textContent = "Session stopped.";
+      } catch (error) {
+        console.error("STOP ERROR:", error);
+        document.getElementById("result").textContent = "Stop failed.";
+        document.getElementById("sessionStatus").textContent = "Session Status: Error";
+      }
+    }
+  </script>
+
+</body>
+</html>

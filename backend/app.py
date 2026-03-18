@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os
 import sys
@@ -13,6 +13,11 @@ if PROJECT_ROOT not in sys.path:
 from ai_engine.counter import run_counter
 
 session_active = False
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 
 @app.route("/start", methods=["POST"])
@@ -52,7 +57,7 @@ def start():
             overlay_video_path=overlay_video_path
         )
 
-        print("Run_counter finished")
+        print("run_counter finished")
         print("FINAL COUNT:", count)
 
         session_active = False

@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['counting-the-number-of-boxes']
+
+roboflow:
+  workspace: varnikas-workspace
+  project: counting_boxes_trad
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/varnikas-workspace/counting_boxes_trad/dataset/2

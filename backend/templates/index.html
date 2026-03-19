@@ -17,70 +17,43 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       background:
         radial-gradient(circle at top left, rgba(99, 102, 241, 0.22), transparent 32%),
         radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.20), transparent 30%),
         linear-gradient(135deg, #eaf2ff 0%, #eef2ff 45%, #f7f1ff 100%);
       padding: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    body::before,
-    body::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      filter: blur(70px);
-      z-index: 0;
-    }
-
-    body::before {
-      top: 60px;
-      left: 120px;
-      background: rgba(99, 102, 241, 0.18);
-    }
-
-    body::after {
-      bottom: 60px;
-      right: 120px;
-      background: rgba(192, 132, 252, 0.18);
     }
 
     .container {
-      position: relative;
-      z-index: 1;
       width: 100%;
-      max-width: 520px;
-      background: rgba(255, 255, 255, 0.78);
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-radius: 28px;
-      padding: 36px 32px;
+      padding: 32px;
       box-shadow:
         0 20px 45px rgba(79, 70, 229, 0.12),
         0 8px 18px rgba(15, 23, 42, 0.06);
-      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.55);
     }
 
     h1 {
-      font-size: 30px;
+      text-align: center;
       margin-bottom: 8px;
       color: #1e293b;
+      font-size: 30px;
     }
 
     .subtitle {
+      text-align: center;
       color: #64748b;
+      margin-bottom: 24px;
       font-size: 14px;
-      margin-bottom: 28px;
     }
 
     .input-group {
-      text-align: left;
       margin-bottom: 18px;
     }
 
@@ -92,20 +65,19 @@
       color: #334155;
     }
 
-    .input-group input[type="text"],
-    .input-group input[type="number"] {
+    .input-group input,
+    .input-group select {
       width: 100%;
-      padding: 14px 15px;
+      padding: 12px 14px;
       border: 1px solid #cbd5e1;
-      border-radius: 14px;
+      border-radius: 12px;
       font-size: 15px;
       outline: none;
-      transition: 0.25s ease;
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.9);
     }
 
-    .input-group input[type="text"]:focus,
-    .input-group input[type="number"]:focus {
+    .input-group input:focus,
+    .input-group select:focus {
       border-color: #6366f1;
       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
     }
@@ -132,7 +104,7 @@
       padding: 11px 18px;
       border-radius: 12px;
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fffaf0 !important;
+      color: #ffffff !important;
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
@@ -155,11 +127,13 @@
     .button-group {
       display: flex;
       gap: 12px;
-      margin-top: 22px;
+      margin-top: 20px;
+      flex-wrap: wrap;
     }
 
     button {
       flex: 1;
+      min-width: 120px;
       padding: 14px;
       border: none;
       border-radius: 14px;
@@ -192,23 +166,54 @@
     }
 
     .status-box,
-    .result-box {
+    .result-box,
+    .links-box,
+    .history-box,
+    .live-box {
       margin-top: 18px;
       padding: 15px;
       border-radius: 16px;
       font-size: 15px;
-      font-weight: 500;
+      background: rgba(248, 250, 252, 0.96);
+      border: 1px solid #e2e8f0;
     }
 
     .status-box {
-      background: rgba(238, 242, 255, 0.95);
       color: #4338ca;
+      font-weight: 600;
     }
 
-    .result-box {
-      background: rgba(248, 250, 252, 0.96);
-      color: #0f172a;
-      border: 1px solid #e2e8f0;
+    .links-box a {
+      display: block;
+      margin-top: 8px;
+      color: #4338ca;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .links-box a:hover {
+      text-decoration: underline;
+    }
+
+    .session-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .session-item:last-child {
+      border-bottom: none;
+    }
+
+    #liveFeed {
+      width: 100%;
+      max-height: 420px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: transparent;
+      margin-top: 10px;
+      display: none;
     }
   </style>
 </head>
@@ -216,7 +221,15 @@
 
   <div class="container">
     <h1>📦 Box Counting System</h1>
-    <p class="subtitle">Upload a video and get the final counted result</p>
+    <p class="subtitle">Upload a video or use laptop webcam for live box counting</p>
+
+    <div class="input-group">
+      <label>Mode</label>
+      <select id="mode" onchange="toggleMode()">
+        <option value="upload">Upload Video</option>
+        <option value="webcam">Laptop Webcam Live Feed</option>
+      </select>
+    </div>
 
     <div class="input-group">
       <label>Operator ID</label>
@@ -233,7 +246,7 @@
       <input type="number" id="confidence" value="0.5" step="0.1" min="0" max="1">
     </div>
 
-    <div class="input-group">
+    <div class="input-group" id="uploadSection">
       <label>Upload Video</label>
       <div class="file-upload-box">
         <label for="videoFile" class="custom-file-label">Choose Video</label>
@@ -243,15 +256,60 @@
     </div>
 
     <div class="button-group">
-      <button class="upload-btn" onclick="uploadAndCount()">Upload & Count</button>
-      <button class="stop-btn" onclick="stopSession()">Stop Session</button>
+      <button class="upload-btn" id="startBtn" onclick="startSession()">Start Session</button>
+      <button class="stop-btn webcam-only" id="pauseBtn" onclick="pauseSession()" style="display:none;">Pause</button>
+      <button class="stop-btn webcam-only" id="resumeBtn" onclick="resumeSession()" style="display:none;">Resume</button>
+      <button class="stop-btn webcam-only" id="doneBtn" onclick="doneSession()" style="display:none;">Done</button>
+      <button class="stop-btn webcam-only" id="stopBtn" onclick="stopSession()" style="display:none;">Stop</button>
     </div>
 
     <div class="status-box" id="sessionStatus">Session Status: Ready</div>
     <div class="result-box" id="result">Final Count: -</div>
+
+    <div class="live-box" id="liveBox" style="display:none;">
+      <strong>Live Webcam Feed</strong>
+      <img id="liveFeed" src="" alt="Live webcam feed">
+    </div>
+
+    <div class="links-box" id="linksBox" style="display:none;">
+      <strong>Downloads</strong>
+      <a id="videoLink" href="#" target="_blank">View Overlay Video</a>
+      <a id="reportLink" href="#" target="_blank">Download PDF Report</a>
+    </div>
+
+    <div class="history-box">
+      <strong>Recent Sessions</strong>
+      <div id="historyList">No sessions yet.</div>
+    </div>
   </div>
 
   <script>
+    function toggleMode() {
+      const mode = document.getElementById("mode").value;
+      const uploadSection = document.getElementById("uploadSection");
+      const liveBox = document.getElementById("liveBox");
+      const webcamButtons = document.querySelectorAll(".webcam-only");
+
+      if (mode === "webcam") {
+        uploadSection.style.display = "none";
+        liveBox.style.display = "block";
+        webcamButtons.forEach(btn => {
+          btn.style.display = "inline-block";
+        });
+        document.getElementById("linksBox").style.display = "none";
+        document.getElementById("result").textContent = "Final Count: -";
+        document.getElementById("liveFeed").style.display = "none";
+      } else {
+        uploadSection.style.display = "block";
+        liveBox.style.display = "none";
+        document.getElementById("liveFeed").src = "";
+        document.getElementById("liveFeed").style.display = "none";
+        webcamButtons.forEach(btn => {
+          btn.style.display = "none";
+        });
+      }    
+    }
+
     function updateFileName() {
       const fileInput = document.getElementById("videoFile");
       const fileName = document.getElementById("fileName");
@@ -263,66 +321,166 @@
       }
     }
 
-    async function uploadAndCount() {
+    async function startSession() {
       try {
+        const mode = document.getElementById("mode").value;
         const fileInput = document.getElementById("videoFile");
         const operatorId = document.getElementById("operatorId").value;
         const batchId = document.getElementById("batchId").value;
         const confidence = document.getElementById("confidence").value;
 
-        if (!fileInput.files.length) {
+        if (mode === "upload" && !fileInput.files.length) {
           alert("Please choose a video file first.");
           return;
         }
 
-        document.getElementById("sessionStatus").textContent = "Session Status: Processing...";
-        document.getElementById("result").textContent = "Processing video...";
+        document.getElementById("sessionStatus").textContent = "Session Status: Live";
+        document.getElementById("result").textContent = "Webcam started. Live preview running in page.";
+        document.getElementById("liveFeed").src = "/video_feed?confidence=" + encodeURIComponent(confidence);
+        document.getElementById("liveFeed").style.display = "block";
 
         const formData = new FormData();
-        formData.append("video", fileInput.files[0]);
+        formData.append("mode", mode);
         formData.append("operator_id", operatorId);
         formData.append("batch_id", batchId);
         formData.append("confidence", confidence);
 
-        const res = await fetch("http://127.0.0.1:5000/start", {
+        if (mode === "upload") {
+          formData.append("video", fileInput.files[0]);
+        }
+
+        const res = await fetch("/start", {
           method: "POST",
           body: formData
         });
 
         const data = await res.json();
-        console.log("START RESPONSE:", data);
 
         if (data.success) {
-          document.getElementById("result").textContent = "Final Count: " + data.count;
-          document.getElementById("sessionStatus").textContent = "Session Status: Completed";
+          if (mode === "webcam") {
+            document.getElementById("sessionStatus").textContent = "Session Status: Live";
+            document.getElementById("result").textContent = "Webcam started. Live preview running in page.";
+            document.getElementById("liveFeed").src = "/video_feed?confidence=" + encodeURIComponent(confidence);
+          } else {
+            document.getElementById("result").textContent =
+              "Final Count: " + data.count +
+              " | Operator: " + data.operator_id +
+              " | Batch: " + data.batch_id;
+
+            document.getElementById("sessionStatus").textContent = "Session Status: Completed";
+            document.getElementById("linksBox").style.display = "block";
+            document.getElementById("videoLink").href = data.overlay_video;
+            document.getElementById("reportLink").href = data.report_file;
+          }
+
+          loadSessions();
         } else {
           document.getElementById("result").textContent = "Error: " + data.error;
           document.getElementById("sessionStatus").textContent = "Session Status: Error";
         }
       } catch (error) {
-        console.error("UPLOAD ERROR:", error);
+        console.error(error);
         document.getElementById("result").textContent = "Error: Could not connect to backend";
         document.getElementById("sessionStatus").textContent = "Session Status: Error";
       }
     }
 
-    async function stopSession() {
+    async function pauseSession() {
       try {
-        const res = await fetch("http://127.0.0.1:5000/stop", {
-          method: "POST"
-        });
-
+        const res = await fetch("/pause", { method: "POST" });
         const data = await res.json();
-        console.log("STOP RESPONSE:", data);
-
-        document.getElementById("sessionStatus").textContent = "Session Status: Stopped";
-        document.getElementById("result").textContent = "Session stopped.";
+        document.getElementById("sessionStatus").textContent = "Session Status: Paused";
+        document.getElementById("result").textContent = data.message || "Session paused.";
       } catch (error) {
-        console.error("STOP ERROR:", error);
-        document.getElementById("result").textContent = "Stop failed.";
         document.getElementById("sessionStatus").textContent = "Session Status: Error";
+        document.getElementById("result").textContent = "Pause failed.";
       }
     }
+
+    async function resumeSession() {
+      try {
+        const res = await fetch("/resume", { method: "POST" });
+        const data = await res.json();
+        document.getElementById("sessionStatus").textContent = "Session Status: Live";
+        document.getElementById("result").textContent = data.message || "Session resumed.";
+      } catch (error) {
+        document.getElementById("sessionStatus").textContent = "Session Status: Error";
+        document.getElementById("result").textContent = "Resume failed.";
+      }
+    }
+
+    async function doneSession() {
+      try {
+        const res = await fetch("/done", { method: "POST" });
+        const data = await res.json();
+
+        document.getElementById("liveFeed").src = "";
+        document.getElementById("liveFeed").style.display = "none";
+
+        if (data.success) {
+          document.getElementById("sessionStatus").textContent = "Session Status: Completed";
+          document.getElementById("result").textContent = "Final Count: " + data.count;
+          document.getElementById("linksBox").style.display = "block";
+          document.getElementById("videoLink").href = data.overlay_video;
+          document.getElementById("reportLink").href = data.report_file;
+        } else {
+          document.getElementById("sessionStatus").textContent = "Session Status: Error";
+          document.getElementById("result").textContent = "Error: " + data.error;
+        }
+
+        loadSessions();
+      } catch (error) {
+        document.getElementById("sessionStatus").textContent = "Session Status: Error";
+        document.getElementById("result").textContent = "Done action failed.";
+      }
+    }
+
+    async function stopSession() {
+      try {
+        const res = await fetch("/stop", { method: "POST" });
+        const data = await res.json();
+
+        document.getElementById("liveFeed").src = "";
+        document.getElementById("liveFeed").style.display = "none";
+        document.getElementById("sessionStatus").textContent = "Session Status: Stopped";
+        document.getElementById("result").textContent = data.message || "Session stopped.";
+      } catch (error) {
+        document.getElementById("sessionStatus").textContent = "Session Status: Error";
+        document.getElementById("result").textContent = "Stop failed.";
+      }
+    }
+
+    async function loadSessions() {
+      try {
+        const res = await fetch("/sessions");
+        const data = await res.json();
+        const historyList = document.getElementById("historyList");
+
+        if (!data.success || !data.sessions.length) {
+          historyList.innerHTML = "No sessions yet.";
+          return;
+        }
+
+        historyList.innerHTML = data.sessions.map(session => `
+          <div class="session-item">
+            <strong>${session.session_id}</strong> |
+            ${session.operator_id} |
+            ${session.batch_id} |
+            ${session.mode} |
+            Count: ${session.final_count} |
+            ${session.timestamp} |
+            ${session.status}
+          </div>
+        `).join("");
+      } catch (error) {
+        document.getElementById("historyList").innerHTML = "Could not load session history.";
+      }
+    }
+
+    window.onload = () => {
+      toggleMode();
+      loadSessions();
+    };
   </script>
 
 </body>

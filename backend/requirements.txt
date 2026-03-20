@@ -1,0 +1,17 @@
+flask
+flask-cors
+opencv-python
+fpdf
+torch
+torchvision
+pandas
+tqdm
+pyyaml
+requests
+matplotlib
+seaborn
+pillow
+psutil
+gitpython
+scipy
+numpy
